@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProteinAI Research Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--gradient);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card h2::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--gradient);
+            border-radius: 50%;
+        }
+
+        textarea,
+        input {
+            width: 100%;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: var(--text);
+            font-family: monospace;
+            resize: vertical;
+        }
+
+        textarea {
+            min-height: 100px;
+        }
+
+        button {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .results {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-dark);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .prob-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            margin-top: 4px;
+        }
+
+        .prob-fill {
+            height: 100%;
+            background: var(--gradient);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .sequence-output {
+            font-family: monospace;
+            word-break: break-all;
+            background: var(--bg-dark);
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+        }
+
+        .stats {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .stat {
+            background: var(--bg-dark);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 1rem;
+            color: var(--text-muted);
+        }
+
+        .tech-badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .badge {
+            background: var(--bg-dark);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--secondary);
+            border: 1px solid var(--secondary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>🧬 ProteinAI Research Platform</h1>
+        <p>AI-powered Protein Analysis & Generation</p>
+        <div class="tech-badges" style="justify-content: center; margin-top: 1rem;">
+            <span class="badge">PyTorch</span>
+            <span class="badge">LLM/NLP</span>
+            <span class="badge">GCN</span>
+            <span class="badge">Diffusion</span>
+            <span class="badge">RL</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="grid">
+            <!-- Sequence Analysis -->
+            <div class="card">
+                <h2>Sequence Analysis</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                    Analyze protein sequences using LLM and GCN models
+                </p>
+                <textarea id="analyzeSeq"
+                    placeholder="Enter protein sequence (e.g., MVLSPADKTNVKAAWGKVGAH)">MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHF</textarea>
+                <button onclick="analyzeSequence()">Analyze</button>
+                <div id="analyzeResults" class="results" style="display: none;"></div>
+            </div>
+
+            <!-- Sequence Generation -->
+            <div class="card">
+                <h2>Sequence Generation</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                    Generate novel protein sequences using Diffusion model
+                </p>
+                <label style="color: var(--text-muted);">Number of sequences:</label>
+                <input type="number" id="genCount" value="3" min="1" max="10">
+                <label style="color: var(--text-muted); margin-top: 0.5rem; display: block;">Length:</label>
+                <input type="number" id="genLength" value="25" min="10" max="100">
+                <button onclick="generateSequences()">Generate</button>
+                <div id="generateResults" class="results" style="display: none;"></div>
+            </div>
+
+            <!-- Sequence Optimization -->
+            <div class="card">
+                <h2>Sequence Optimization</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                    Optimize sequences for target properties using RL
+                </p>
+                <label style="color: var(--text-muted);">Target Hydropathy (-4 to 4):</label>
+                <input type="range" id="targetHydro" min="-4" max="4" step="0.5" value="0" oninput="updateHydroLabel()">
+                <span id="hydroLabel">0</span>
+                <label style="color: var(--text-muted); margin-top: 0.5rem; display: block;">Target Charge:</label>
+                <input type="range" id="targetCharge" min="-5" max="5" step="1" value="0" oninput="updateChargeLabel()">
+                <span id="chargeLabel">0</span>
+                <button onclick="optimizeSequence()">Optimize</button>
+                <div id="optimizeResults" class="results" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateHydroLabel() {
+            document.getElementById('hydroLabel').textContent = document.getElementById('targetHydro').value;
+        }
+
+        function updateChargeLabel() {
+            document.getElementById('chargeLabel').textContent = document.getElementById('targetCharge').value;
+        }
+
+        async function analyzeSequence() {
+            const seq = document.getElementById('analyzeSeq').value.trim();
+            const results = document.getElementById('analyzeResults');
+
+            results.style.display = 'block';
+            results.innerHTML = '<div class="loading">Analyzing...</div>';
+
+            try {
+                const resp = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sequence: seq })
+                });
+
+                const data = await resp.json();
+
+                if (data.error) {
+                    results.innerHTML = `<div style="color: #ef4444;">${data.error}</div>`;
+                    return;
+                }
+
+                let html = `
+                    <div class="stats">
+                        <div class="stat"><div class="stat-value">${data.properties.length}</div><div class="stat-label">Length</div></div>
+                        <div class="stat"><div class="stat-value">${data.properties.molecular_weight.toFixed(0)}</div><div class="stat-label">MW (Da)</div></div>
+                        <div class="stat"><div class="stat-value">${data.properties.hydropathy.toFixed(2)}</div><div class="stat-label">Hydropathy</div></div>
+                        <div class="stat"><div class="stat-value">${(data.properties.polarity * 100).toFixed(0)}%</div><div class="stat-label">Polarity</div></div>
+                    </div>
+                    <h4 style="margin-top: 1rem;">Function Predictions (LLM)</h4>
+                `;
+
+                data.functions.forEach(f => {
+                    html += `
+                        <div class="result-item">
+                            <span>${f.name}</span>
+                            <span>${(f.prob * 100).toFixed(1)}%</span>
+                        </div>
+                        <div class="prob-bar"><div class="prob-fill" style="width: ${f.prob * 100}%"></div></div>
+                    `;
+                });
+
+                html += '<h4 style="margin-top: 1rem;">Structure Analysis (GCN)</h4>';
+                data.structure.forEach(s => {
+                    html += `
+                        <div class="result-item">
+                            <span>${s.class}</span>
+                            <span>${(s.prob * 100).toFixed(1)}%</span>
+                        </div>
+                        <div class="prob-bar"><div class="prob-fill" style="width: ${s.prob * 100}%"></div></div>
+                    `;
+                });
+
+                results.innerHTML = html;
+            } catch (e) {
+                results.innerHTML = `<div style="color: #ef4444;">Error: ${e.message}</div>`;
+            }
+        }
+
+        async function generateSequences() {
+            const count = parseInt(document.getElementById('genCount').value);
+            const length = parseInt(document.getElementById('genLength').value);
+            const results = document.getElementById('generateResults');
+
+            results.style.display = 'block';
+            results.innerHTML = '<div class="loading">Generating...</div>';
+
+            try {
+                const resp = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ count, length })
+                });
+
+                const data = await resp.json();
+
+                let html = '<h4>Generated Sequences</h4>';
+                data.sequences.forEach((s, i) => {
+                    html += `
+                        <div style="margin-top: 0.75rem;">
+                            <strong>#${i + 1}</strong> (Length: ${s.length}, Hydro: ${s.hydropathy.toFixed(2)})
+                            <div class="sequence-output">${s.sequence}</div>
+                        </div>
+                    `;
+                });
+
+                results.innerHTML = html;
+            } catch (e) {
+                results.innerHTML = `<div style="color: #ef4444;">Error: ${e.message}</div>`;
+            }
+        }
+
+        async function optimizeSequence() {
+            const hydropathy = parseFloat(document.getElementById('targetHydro').value);
+            const charge = parseFloat(document.getElementById('targetCharge').value);
+            const results = document.getElementById('optimizeResults');
+
+            results.style.display = 'block';
+            results.innerHTML = '<div class="loading">Optimizing with RL...</div>';
+
+            try {
+                const resp = await fetch('/api/optimize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ hydropathy, charge })
+                });
+
+                const data = await resp.json();
+
+                results.innerHTML = `
+                    <h4>Optimized Sequence</h4>
+                    <div class="sequence-output">${data.sequence}</div>
+                    <div class="stats">
+                        <div class="stat"><div class="stat-value">${data.properties.hydro.toFixed(2)}</div><div class="stat-label">Hydropathy</div></div>
+                        <div class="stat"><div class="stat-value">${data.properties.charge.toFixed(1)}</div><div class="stat-label">Charge</div></div>
+                        <div class="stat"><div class="stat-value">${data.reward.toFixed(2)}</div><div class="stat-label">Reward</div></div>
+                    </div>
+                `;
+            } catch (e) {
+                results.innerHTML = `<div style="color: #ef4444;">Error: ${e.message}</div>`;
+            }
+        }
+    </script>
+</body>
+
+</html>
