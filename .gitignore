@@ -1,0 +1,8 @@
+
+
+# Local generated artifacts and private captures
+__pycache__/
+*.py[cod]
+.aistudio/artifacts/
+*.pcap
+*.pcapng
